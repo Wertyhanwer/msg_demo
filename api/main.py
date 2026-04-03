@@ -1,13 +1,15 @@
-from fastapi import FastAPI
-
-app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+from logger import setup_logging
+import asyncio
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
+def start_logger():
+    logger = setup_logging()
+
+
+async def main():
+    start_logger()
+    db = Database()  # logger уже готов внутри!
+    await db.connect()
+    # ...
+
+asyncio.run(main())
