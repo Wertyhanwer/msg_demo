@@ -37,13 +37,13 @@ LOGGING_CONFIG = {
         #---------- DB ----------
         'db_info': {
             'class': 'logging.FileHandler',
-            'filename': 'db.log',
+            'filename': 'logs/db.log',
             'level': 'INFO',
             'formatter': 'simple'
         },
         'db_error': {
             'class': 'logging.FileHandler',
-            'filename': 'db.log',
+            'filename': 'logs/db.log',
             'level': 'CRITICAL',
             'formatter': 'critical'
         }
