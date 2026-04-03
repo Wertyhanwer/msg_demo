@@ -5,6 +5,7 @@ import logging
 
 
 
+
 # engine = create_async_engine(DATABASE_URL, echo=True)
 #
 # AsyncSessionLocal = async_sessionmaker(
@@ -15,7 +16,6 @@ import logging
 
 class DBEngine:
     _instance = None
-    _engine = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -27,13 +27,28 @@ class DBEngine:
             return
 
         self._init_logger()
-        self._db_url = self._generate_db_url()
+        self._generate_db_url()
+        self._create_async_engine()
+        self._create_session_fabric()
+
+        self._initialized = True
 
 
-    @staticmethod
-    def _generate_db_url():
-        db_url = f"postgresql+asyncpg://{user}:{password}@{ip}:{port}/{dbname}"
-        return db_url
+    def _generate_db_url(self):
+        self._db_url = f"postgresql+asyncpg://{user}:{password}@{ip}:{port}/{dbname}"
 
     def _init_logger(self):
         self._logger = logging.getLogger("messenger.db")
+
+    def _create_async_engine(self):
+        self._db_engine = create_async_engine(
+            self._db_url,
+            echo=True
+        )
+
+    def _create_session_fabric(self):
+        self._async_session_maker = async_sessionmaker(
+            bind=self._db_engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
+        )
