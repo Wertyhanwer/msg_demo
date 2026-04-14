@@ -47,8 +47,8 @@ class UserRepository:
             await self._session.refresh(user)
             return user
         except Exception as e:
-            self._logger.error(f"Error at update user.name by id {{id: {user_id}, username: {new_username}  {user_id}: {e}")
-            raise DatabaseError(f"Error at update user.name by id {{id: {user_id}, username: {new_username}  {user_id}: {e}") from e
+            self._logger.error(f"Error at update user.name by id {{id: {user_id}, username: {new_username}  {user_id}: {e} }}")
+            raise DatabaseError(f"Error at update user.name by id {{id: {user_id}, username: {new_username}  {user_id}: {e} }}") from e
 
     async def delete_user_by_id(self, user_id: int) -> User | None:
         self._logger.info(f"Delete user by id request {{id: {user_id}}}")
