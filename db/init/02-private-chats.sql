@@ -4,3 +4,5 @@ CREATE TABLE IF NOT EXISTS private_chats(
     user2_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 )
+
+

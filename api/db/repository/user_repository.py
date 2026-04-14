@@ -3,7 +3,7 @@ import logging
 from db.exceptions import DatabaseError
 from db.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
@@ -23,26 +23,42 @@ class UserRepository:
             raise DatabaseError(f"Error at user creating {username}") from e
 
     async def get_by_id(self, user_id: int) -> User | None:
-        result = await self._session.execute(
-            select(User).where(User.id == user_id)
-        )
-        user = result.scalar_one_or_none()
-        return user
+        self._logger.info(f"Get user by id request {{id: {user_id} }}")
+        try:
+            result = await self._session.execute(
+                select(User).where(User.id == user_id)
+            )
+            user = result.scalar_one_or_none()
+            return user
+        except Exception as e:
+            self._logger.error(f"Error at user getting user by id {user_id}: {e}")
+            raise DatabaseError(f"Error at user getting user by id {user_id}.") from e
+
 
     async def update_username_by_user_id(self, user_id: int, new_username: str) -> User | None:
-       user: User = await self.get_by_id(user_id)
-       if user is None:
-           return None
+        self._logger.info(f"Update user.name by id request {{id: {user_id}, username: {new_username} }}")
+        try:
+            user: User = await self.get_by_id(user_id)
+            if user is None:
+               return None
 
-       user.username = new_username
-       await self._session.commit()
-       await self._session.refresh(user)
-       return user
+            user.username = new_username
+            await self._session.commit()
+            await self._session.refresh(user)
+            return user
+        except Exception as e:
+            self._logger.error(f"Error at update user.name by id {{id: {user_id}, username: {new_username}  {user_id}: {e}")
+            raise DatabaseError(f"Error at update user.name by id {{id: {user_id}, username: {new_username}  {user_id}: {e}") from e
 
     async def delete_user_by_id(self, user_id: int) -> User | None:
-        user: User = await self.get_by_id(user_id)
-        if user is None:
-            return None
-        await self._session.delete(user)
-        await self._session.commit()
-        return user
+        self._logger.info(f"Delete user by id request {{id: {user_id}}}")
+        try:
+            user: User = await self.get_by_id(user_id)
+            if user is None:
+                return None
+            await self._session.delete(user)
+            await self._session.commit()
+            return user
+        except Exception as e:
+            self._logger.error(f"Error at delete user by id {user_id}: {e}")
+            raise DatabaseError(f"Error at delete user by id {user_id}: {e}") from e
