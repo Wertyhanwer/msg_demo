@@ -1,15 +1,17 @@
-from logger import setup_logging
 import asyncio
 
+from logger import setup_logging
+from fastapi import FastAPI
+from routers import users
 
-def start_logger():
-    logger = setup_logging()
 
 
 async def main():
-    start_logger()
-    db = Database()  # logger уже готов внутри!
-    await db.connect()
-    # ...
+    setup_logging()
 
-asyncio.run(main())
+    app = FastAPI()
+    app.include_router(users.router)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

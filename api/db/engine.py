@@ -53,3 +53,6 @@ class DBEngine:
         except Exception as e:
             self._logger.critical(f"Critical error at _create_session_fabric: {e}")
             raise DatabaseError(f"Critical error at _create_session_fabric") from e
+
+    def get_session(self):
+        return self._async_session_maker()
