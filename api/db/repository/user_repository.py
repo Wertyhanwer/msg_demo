@@ -26,7 +26,7 @@ class UserRepository:
         self._logger.info(f"Get user by id request {{id: {user_id} }}")
         try:
             result = await self._session.execute(
-                select(User).where(User.id == user_id)
+                select(User).where(User.id_ == user_id)
             )
             user = result.scalar_one_or_none()
             return user

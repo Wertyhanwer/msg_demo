@@ -1,3 +1,42 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.repository.user_repository import UserRepository
+from schemas.user import UserCreate, UserUpdateUsername, UserResponse
+from dependencies import get_session
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.post("/", response_model=UserResponse, status_code=201)
+async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session)):
+    repo = UserRepository(session)
+    user = await repo.create(data.username, data.email, data.password)
+    return user
+
+
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user(user_id: int, session: AsyncSession = Depends(get_session)):
+    repo = UserRepository(session)
+    user = await repo.get_by_id(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@router.patch("/{user_id}", response_model=UserResponse)
+async def update_username(user_id: int, data: UserUpdateUsername, session: AsyncSession = Depends(get_session)):
+    repo = UserRepository(session)
+    user = await repo.update_username_by_user_id(user_id, data.username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@router.delete("/{user_id}", response_model=UserResponse)
+async def delete_user(user_id: int, session: AsyncSession = Depends(get_session)):
+    repo = UserRepository(session)
+    user = await repo.delete_user_by_id(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user

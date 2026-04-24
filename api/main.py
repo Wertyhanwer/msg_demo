@@ -1,17 +1,8 @@
-import asyncio
-
-from logger import setup_logging
+from logger.logger_config import setup_logging
 from fastapi import FastAPI
 from routers import users
 
+setup_logging()
 
-
-async def main():
-    setup_logging()
-
-    app = FastAPI()
-    app.include_router(users.router)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+app = FastAPI(title="RotCom")
+app.include_router(users.router)

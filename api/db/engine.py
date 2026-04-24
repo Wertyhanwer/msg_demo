@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from configs.engine_config import ip, user, password, port, dbname
+from .configs.engine_config import ip, user, password, port, dbname
 import logging
 
 from db.exceptions import DatabaseError

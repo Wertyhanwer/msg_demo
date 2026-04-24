@@ -22,13 +22,13 @@ LOGGING_CONFIG = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': 'app.log',
+            'filename': 'logs/app.log',
             'level': 'INFO',
             'formatter': 'simple'
         },
         'errors': {
             'class': 'logging.FileHandler',
-            'filename': 'errors.log',
+            'filename': 'logs/errors.log',
             'level': 'ERROR',
             'formatter': 'simple'
         },
