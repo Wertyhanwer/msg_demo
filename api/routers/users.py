@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.repository.user_repository import UserRepository
 from schemas.user import UserCreate, UserUpdateUsername, UserResponse
 from dependencies import get_session
+from service import hash_password
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -11,7 +13,8 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.post("/", response_model=UserResponse, status_code=201)
 async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session)):
     repo = UserRepository(session)
-    user = await repo.create(data.username, data.email, data.password)
+    password_hash = hash_password(data.password)
+    user = await repo.create(data.username, data.email, password_hash)
     return user
 
 
