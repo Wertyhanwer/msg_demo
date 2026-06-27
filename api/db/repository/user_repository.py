@@ -34,6 +34,17 @@ class UserRepository:
             self._logger.error(f"Error at user getting user by id {user_id}: {e}")
             raise DatabaseError(f"Error at user getting user by id {user_id}.") from e
 
+    async def get_by_email(self, user_email: str) -> User | None:
+        self._logger.info(f"Get user by email request {{email: {user_email} }}")
+        try:
+            result = await self._session.execute(
+                select(User).where(User.email == user_email)
+            )
+            user = result.scalar_one_or_none()
+            return user
+        except Exception as e:
+            self._logger.error(f"Error at user getting user by email {user_email}: {e}")
+            raise DatabaseError(f"Error at user getting user by email {user_email}.") from e
 
     async def update_username_by_user_id(self, user_id: int, new_username: str) -> User | None:
         self._logger.info(f"Update user.name by id request {{id: {user_id}, username: {new_username} }}")
