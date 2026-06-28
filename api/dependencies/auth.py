@@ -19,7 +19,7 @@ async def get_current_user(
         payload = decode_token(token)
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
-    
+
     user_id = int(payload.sub)
     user = await rep.get_by_id(user_id)  # тянет юзера из БД
     if user is None:
