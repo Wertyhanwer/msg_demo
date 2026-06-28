@@ -20,8 +20,14 @@ async def login_user(login: str, password: str, session: AsyncSession = Depends(
     rep = UserRepository(session)
     if is_email(login):
         user = await rep.get_by_email(login)
+        if user is None:
+            logger.info(f"User does not exist by email: {login}")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
     else:
         user = await rep.get_by_username(login)
+        if user is None:
+            logger.info(f"User does not exist by login: {login}")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
 
     if user is None:
         logger.info(f"User does not exist by login: {login}")
@@ -38,7 +44,7 @@ def password_check(user: User, password: str) -> bool:
 
 def is_email(value: str) -> bool:
     try:
-        validate_email(value)
+        validate_email(value, check_deliverability=False)
         return True
     except EmailNotValidError:
         return False

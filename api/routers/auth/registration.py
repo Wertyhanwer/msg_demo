@@ -6,7 +6,7 @@ from routers.service import hash_password
 from schemas.user import UserResponse, UserCreate
 from db.repository.user_repository import UserRepository
 from dependencies import get_session
-from exceptions import UserAlreadyExistsError
+from .exceptions import UserAlreadyExistsError
 
 
 import logging
