@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from dependencies import get_session
-from db.models.users import User
+from db.models.user import User
 from db.repository.user_repository import UserRepository
 from routers.service.JWT.token_decode import decode_token
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func, ForeignKey
 from base import Base
 
-class PrivateChats(Base):
+class PrivateChat(Base):
     __tablename__ = "private_chats"
 
     id_: Mapped[int] = mapped_column("id", primary_key=True)
