@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.repository.user_repository import UserRepository
 from schemas.user import UserCreate, UserUpdateUsername, UserResponse
-from dependencies import get_session
+from dependencies import get_session_async
 from .service import hash_password
 
 
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/", response_model=UserResponse, status_code=201)
-async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session)):
+async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session_async)):
     repo = UserRepository(session)
     password_hash = hash_password(data.password)
     user = await repo.create(data.username, data.email, password_hash)
@@ -19,7 +19,7 @@ async def create_user(data: UserCreate, session: AsyncSession = Depends(get_sess
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-async def get_user(user_id: int, session: AsyncSession = Depends(get_session)):
+async def get_user(user_id: int, session: AsyncSession = Depends(get_session_async)):
     repo = UserRepository(session)
     user = await repo.get_by_id(user_id)
     if user is None:
@@ -28,7 +28,7 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_session)):
 
 
 @router.patch("/{user_id}", response_model=UserResponse)
-async def update_username(user_id: int, data: UserUpdateUsername, session: AsyncSession = Depends(get_session)):
+async def update_username(user_id: int, data: UserUpdateUsername, session: AsyncSession = Depends(get_session_async)):
     repo = UserRepository(session)
     user = await repo.update_username_by_user_id(user_id, data.username)
     if user is None:
@@ -37,7 +37,7 @@ async def update_username(user_id: int, data: UserUpdateUsername, session: Async
 
 
 @router.delete("/{user_id}", response_model=UserResponse)
-async def delete_user(user_id: int, session: AsyncSession = Depends(get_session)):
+async def delete_user(user_id: int, session: AsyncSession = Depends(get_session_async)):
     repo = UserRepository(session)
     user = await repo.delete_user_by_id(user_id)
     if user is None:

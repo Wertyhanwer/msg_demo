@@ -5,7 +5,7 @@ from routers.auth.exceptions import RegistrationError
 from routers.service import hash_password
 from schemas.user import UserResponse, UserCreate
 from db.repository.user_repository import UserRepository
-from dependencies import get_session
+from dependencies import get_session_async
 from .exceptions import UserAlreadyExistsError
 
 
@@ -15,7 +15,7 @@ logger = logging.getLogger("messenger.auth")
 router = APIRouter(prefix="/registration", tags=["registration"])
 
 @router.post("/", response_model=UserResponse)
-async def register_user(data: UserCreate, session: AsyncSession = Depends(get_session)):
+async def register_user(data: UserCreate, session: AsyncSession = Depends(get_session_async)):
     rep = UserRepository(session)
     try:
         if await rep.get_by_email(data.email) is not None:

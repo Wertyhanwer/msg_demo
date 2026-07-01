@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from email_validator import validate_email, EmailNotValidError
 
-from dependencies import get_session
+from dependencies import get_session_async
 from schemas.jwt_token import TokenResponse
 from routers.service.hash import verify_hash
 from db.repository.user_repository import UserRepository
@@ -16,7 +16,7 @@ logger = logging.getLogger("messenger.auth")
 
 
 @router.post("/", response_model=TokenResponse)
-async def login_user(login: str, password: str, session: AsyncSession = Depends(get_session)):
+async def login_user(login: str, password: str, session: AsyncSession = Depends(get_session_async)):
     rep = UserRepository(session)
     if is_email(login):
         user = await rep.get_by_email(login)
