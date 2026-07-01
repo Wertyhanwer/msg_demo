@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import BigInteger, ForeignKey, Text, func
 from datetime import datetime
-from base import Base
+from .base import Base
 
 class Message(Base):
     __tablename__ = "messages"

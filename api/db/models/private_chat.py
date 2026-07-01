@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func, ForeignKey
-from base import Base
+from .base import Base
 
 class PrivateChat(Base):
     __tablename__ = "private_chats"
