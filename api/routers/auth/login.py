@@ -24,7 +24,7 @@ async def login_user(login: str, password: str, session: AsyncSession = Depends(
             logger.info(f"User does not exist by email: {login}")
             raise HTTPException(status_code=401, detail="Invalid credentials")
     else:
-        user = await rep.get_by_username(login)
+        user = await rep.get_by_login(login)
         if user is None:
             logger.info(f"User does not exist by login: {login}")
             raise HTTPException(status_code=401, detail="Invalid credentials")

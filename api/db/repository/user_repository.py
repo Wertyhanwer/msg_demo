@@ -10,10 +10,10 @@ class UserRepository:
         self._session = session
         self._logger = logging.getLogger("messenger.db")
 
-    async def create(self, username: str, email: str, password_hash: str) -> User:
-        self._logger.info(f"User create request {{username: {username}, email: {email}}}")
+    async def create(self, username: str, login: str, email: str, password_hash: str) -> User:
+        self._logger.info(f"User create request {{username: {username}, login: {login}, email: {email}}}")
         try:
-            user = User(username=username, email=email, password_hash=password_hash)
+            user = User(username=username, login=login, email=email, password_hash=password_hash)
             self._session.add(user)
             await self._session.commit()
             await self._session.refresh(user)
@@ -46,17 +46,17 @@ class UserRepository:
             self._logger.error(f"Error at user getting user by email {user_email}: {e}")
             raise DatabaseError(f"Error at user getting user by email {user_email}.") from e
 
-    async def get_by_username(self, username: str) -> User | None:
-        self._logger.info(f"Get user by username request {{username: {username} }}")
+    async def get_by_login(self, login: str) -> User | None:
+        self._logger.info(f"Get user by login request {{login: {login} }}")
         try:
             result = await self._session.execute(
-                select(User).where(User.username == username)
+                select(User).where(User.login == login)
             )
             user = result.scalar_one_or_none()
             return user
         except Exception as e:
-            self._logger.error(f"Error at user getting user by username {username}: {e}")
-            raise DatabaseError(f"Error at user getting user by username {username}.") from e
+            self._logger.error(f"Error at user getting user by login {login}: {e}")
+            raise DatabaseError(f"Error at user getting user by login {login}.") from e
 
     async def update_username_by_user_id(self, user_id: int, new_username: str) -> User | None:
         self._logger.info(f"Update user.name by id request {{id: {user_id}, username: {new_username} }}")
