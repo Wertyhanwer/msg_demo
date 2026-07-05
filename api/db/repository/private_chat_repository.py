@@ -1,6 +1,7 @@
 import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func, or_
 
 from db.models.private_chat import PrivateChat
 from db.models.user import User
@@ -43,6 +44,33 @@ class PrivateChatRepository:
             raise DatabaseError(
                 f"Error at requesting private chat {{user_a: {user_a}, user_b: {user_b}}}: {e}") from e
 
+    async def get_all_by_user(self, user_id: int, limit: int=50, offset: int=0) -> list:
+        self._logger.info(f"Chats requests by user_id: {{user_id: {user_id}, limit: {limit}, offset: {offset}}}")
+        try:
+            private_chat_request = select(PrivateChat).where(
+                or_(PrivateChat.user1_id == user_id, PrivateChat.user2_id == user_id)
+
+            ).order_by(PrivateChat.last_event_at.desc()).limit(limit).offset(offset)
+            private_chat = await self._session.execute(private_chat_request)
+            return private_chat.scalars().all()
+        except Exception as e:
+            self._logger.error(
+                f"Error at requesting private chats by user_id {{user_id: {user_id}, limit: {limit}, offset: {offset}}}: {e}")
+            raise DatabaseError(
+                f"Error at requesting private chats by user_id {{user_id: {user_id}, limit: {limit}, offset: {offset}}}") from e
+
+    async def update_last_event(self, chat_id: int):
+        try:
+            private_chat_request = select(PrivateChat).where(
+                PrivateChat.id_ == chat_id
+            )
+            result = await self._session.execute(private_chat_request)
+            private_chat = result.scalar_one_or_none()
+            private_chat.last_event_at = func.now()
+            await self._session.commit()
+            await self._session.refresh(private_chat)
+        except Exception as e:
+            raise DatabaseError() from e
 
 
 
