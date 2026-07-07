@@ -16,10 +16,17 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("/", response_model=UserResponse, status_code=201)
 async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session_async)):
+    logger.info(f"Create user request {{username: {data.username}, login: {data.login}}}")
     repo = UserRepository(session)
     password_hash = hash_password(data.password)
     user = await repo.create(data.username, data.email, password_hash)
     return user
+
+
+@router.get("/me", response_model=UserResponse)
+async def get_me(current_user: User = Depends(get_current_user)):
+    logger.info(f"Get me request {{user_id: {current_user.id_}}}")
+    return current_user
 
 
 @router.get("/search", response_model=UserResponse)
