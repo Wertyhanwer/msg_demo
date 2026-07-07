@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.models.user import User
 from db.repository.private_chat_repository import PrivateChatRepository
 from db.repository.message_repository import MessageRepository
+from schemas.private_chat import PrivateChatResponse
 from dependencies import get_session_async
 from dependencies.auth import get_current_user
 
@@ -13,7 +14,7 @@ logger = logging.getLogger("messenger.chats")
 router = APIRouter(prefix="/chats/private", tags=["chats"])
 
 
-@router.get("/")
+@router.get("/", response_model=list[PrivateChatResponse])
 async def get_chats(
     limit: int = 50,
     offset: int = 0,

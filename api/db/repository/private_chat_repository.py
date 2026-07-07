@@ -59,7 +59,7 @@ class PrivateChatRepository:
             raise DatabaseError(
                 f"Error at requesting private chats by user_id {{user_id: {user_id}, limit: {limit}, offset: {offset}}}") from e
 
-    async def update_last_event(self, chat_id: int):
+    async def update_last_event(self, chat_id: int, last_message: str):
         try:
             private_chat_request = select(PrivateChat).where(
                 PrivateChat.id_ == chat_id
@@ -67,6 +67,7 @@ class PrivateChatRepository:
             result = await self._session.execute(private_chat_request)
             private_chat = result.scalar_one_or_none()
             private_chat.last_event_at = func.now()
+            private_chat.last_message = last_message
             await self._session.commit()
             await self._session.refresh(private_chat)
         except Exception as e:

@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import func, ForeignKey
+from sqlalchemy import func, ForeignKey, Text
 from .base import Base
 
 class PrivateChat(Base):
@@ -12,3 +13,4 @@ class PrivateChat(Base):
     user2_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now())
     last_event_at: Mapped[datetime] = mapped_column(default=func.now())
+    last_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

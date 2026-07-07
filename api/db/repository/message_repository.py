@@ -18,7 +18,7 @@ class MessageRepository:
             self._session.add(message)
             await self._session.commit()
             await self._session.refresh(message)
-            await PrivateChatRepository(self._session).update_last_event(chat_id)
+            await PrivateChatRepository(self._session).update_last_event(chat_id, content)
             return message
         except Exception as e:
             self._logger.error(f"Error at user creating message {{chat_id: {chat_id}, from_user_id: {from_user_id}}}: {e}")
