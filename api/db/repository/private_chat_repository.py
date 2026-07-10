@@ -1,7 +1,7 @@
 import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, case
 
 from db.models.private_chat import PrivateChat
 from db.models.user import User
@@ -47,12 +47,14 @@ class PrivateChatRepository:
     async def get_all_by_user(self, user_id: int, limit: int=50, offset: int=0) -> list:
         self._logger.info(f"Chats requests by user_id: {{user_id: {user_id}, limit: {limit}, offset: {offset}}}")
         try:
-            private_chat_request = select(PrivateChat).where(
+            private_chat_request = select(PrivateChat, User).join(
+                User,
+                User.id_ == case((PrivateChat.user1_id == user_id, PrivateChat.user2_id), else_=PrivateChat.user1_id)
+            ).where(
                 or_(PrivateChat.user1_id == user_id, PrivateChat.user2_id == user_id)
-
             ).order_by(PrivateChat.last_event_at.desc()).limit(limit).offset(offset)
-            private_chat = await self._session.execute(private_chat_request)
-            return private_chat.scalars().all()
+            private_chat_with_user_data = await self._session.execute(private_chat_request)
+            return private_chat_with_user_data.all()
         except Exception as e:
             self._logger.error(
                 f"Error at requesting private chats by user_id {{user_id: {user_id}, limit: {limit}, offset: {offset}}}: {e}")

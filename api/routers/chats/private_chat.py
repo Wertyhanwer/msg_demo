@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.models.user import User
 from db.repository.private_chat_repository import PrivateChatRepository
 from db.repository.message_repository import MessageRepository
-from schemas.private_chat import PrivateChatResponse
+from schemas.private_chat import PrivateChatResponse, OtherUserInfo
 from dependencies import get_session_async
 from dependencies.auth import get_current_user
 
@@ -24,7 +24,17 @@ async def get_chats(
     logger.info(f"Get chats request {{user_id: {current_user.id_}, limit: {limit}, offset: {offset}}}")
     try:
         rep = PrivateChatRepository(session)
-        return await rep.get_all_by_user(current_user.id_, limit, offset)
+        rows = await rep.get_all_by_user(current_user.id_, limit, offset)
+        return [
+            PrivateChatResponse(
+                id_=chat.id_,
+                created_at=chat.created_at,
+                last_event_at=chat.last_event_at,
+                last_message=chat.last_message,
+                other_user=OtherUserInfo.model_validate(user),
+            )
+            for chat, user in rows
+        ]
     except Exception as e:
         logger.error(f"Error getting chats {{user_id: {current_user.id_}}}: {e}")
         raise HTTPException(status_code=500, detail="Failed to get chats")
@@ -45,3 +55,4 @@ async def get_messages(
     except Exception as e:
         logger.error(f"Error getting messages {{chat_id: {chat_id}, user_id: {current_user.id_}}}: {e}")
         raise HTTPException(status_code=500, detail="Failed to get messages")
+
